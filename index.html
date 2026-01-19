@@ -177,29 +177,27 @@
         // Load blog posts from GitHub
         async function loadBlogPosts() {
             try {
-                const response = await fetch(GITHUB_POSTS_URL);
-
+                // Adding a timestamp ensures the browser doesn't load a cached, broken version
+                const response = await fetch(`${GITHUB_POSTS_URL}?t=${new Date().getTime()}`);
+        
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
-                allBlogPosts = await response.json();
-
+        
+                const data = await response.json();
+                allBlogPosts = data;
+        
                 if (!Array.isArray(allBlogPosts) || allBlogPosts.length === 0) {
                     showError('No blog posts found.');
                     return;
                 }
-
+        
                 setupFilters();
                 renderBlogCards();
-
+        
             } catch (error) {
                 console.error('Error loading blog posts:', error);
-                showError(`
-                    <strong>Unable to load blog posts.</strong><br>
-                    Make sure you've updated the GitHub URL in the code and that blog-posts.json exists.<br>
-                    <small>Error: ${error.message}</small>
-                `);
+                showError(`Error: ${error.message}`);
             }
         }
 
