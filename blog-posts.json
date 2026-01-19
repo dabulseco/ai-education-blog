@@ -31,7 +31,7 @@
   "title": "Designing AI-Tolerant Curricula for the Modern Biotech Lab",
   "excerpt": "How community college courses in antibody engineering and data science are evolving to integrate AI while maintaining academic integrity.",
   "date": "2026-01-19",
-  "image": "images/ai_classroom.jpg",
+  "image": "images/ai_classroom.png",
   "category": "Curriculum Design",
   "content": "<h2>Designing AI-Tolerant Curricula for the Modern Biotech Lab</h2><p class=\"text-muted\">Published on January 19, 2026 | Category: Curriculum Design</p><img src=\"https://images.unsplash.com/photo-1532187875605-1ef6c237ddc4?w=800&h=400&fit=crop\" class=\"img-fluid rounded mb-4\" alt=\"Lab Bench\"><p>In the rapidly evolving landscape of biotechnology, education must move beyond traditional testing. We are currently developing assignments that are 'AI-tolerant'—meaning they acknowledge the existence of AI while requiring human-centric critical thinking.</p><h3>Process over Product</h3><p>In antibody engineering, our focus is shifting toward wet lab procedure design and the critique of protein structures. By emphasizing non-textual representations and protein structure analysis, we create assessments that a text-based LLM cannot simply solve for a student.</p><h3>Authenticity in Data Science</h3><p>For data science students, the key lies in 'messy' local data. Instead of using clean, global datasets, students work with unique local parameters that require original code and an 'AI Journey' statement—a mandatory reflection on how and why they used AI tools during their coding process.</p>"
 }
