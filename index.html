@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI in Education - Blog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+
+        .blog-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .badge-date {
+            background-color: var(--accent-color);
+        }
+
+        .btn-read-more {
+            background-color: var(--accent-color);
+            border: none;
+        }
+
+        .btn-read-more:hover {
+            background-color: #2980b9;
+        }
+
+        #fullArticle {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .back-btn {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            border: 1px solid #f5c2c7;
+            color: #842029;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .filter-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            margin: 5px;
+        }
+
+        .filter-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="showHome()">AI in Education</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showHome()">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero text-center" id="heroSection">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">AI in Education</h1>
+            <p class="lead">Exploring the intersection of artificial intelligence and learning</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <!-- Filter Section -->
+        <div id="filterSection" class="filter-section" style="display: none;">
+            <h5 class="mb-3">Filter by Category:</h5>
+            <div id="categoryFilters">
+                <!-- Category buttons will be inserted here -->
+            </div>
+        </div>
+
+        <div id="blogGrid" class="row g-4">
+            <div class="col-12 loading-message">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Loading blog posts...</p>
+            </div>
+        </div>
+
+        <div id="fullArticle" class="p-4 d-none">
+            <a href="#" class="back-btn" onclick="showHome()">← Back to all posts</a>
+            <article id="articleContent" class="mt-4">
+                <!-- Full article content will be inserted here -->
+            </article>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 AI in Education Blog. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let allBlogPosts = [];
+        let currentFilter = 'all';
+
+        // IMPORTANT: Replace 'YOUR-USERNAME' and 'YOUR-REPO' with your actual GitHub username and repository name
+        const GITHUB_POSTS_URL = 'https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/blog-posts.json';
+
+        // Load blog posts from GitHub
+        async function loadBlogPosts() {
+            try {
+                const response = await fetch(GITHUB_POSTS_URL);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                allBlogPosts = await response.json();
+
+                if (!Array.isArray(allBlogPosts) || allBlogPosts.length === 0) {
+                    showError('No blog posts found.');
+                    return;
+                }
+
+                setupFilters();
+                renderBlogCards();
+
+            } catch (error) {
+                console.error('Error loading blog posts:', error);
+                showError(`
+                    <strong>Unable to load blog posts.</strong><br>
+                    Make sure you've updated the GitHub URL in the code and that blog-posts.json exists.<br>
+                    <small>Error: ${error.message}</small>
+                `);
+            }
+        }
+
+        function showError(message) {
+            const grid = document.getElementById('blogGrid');
+            grid.innerHTML = `
+                <div class="col-12">
+                    <div class="error-message">
+                        ${message}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Setup category filters
+        function setupFilters() {
+            const categories = ['all', ...new Set(allBlogPosts.map(post => post.category))];
+            const filterContainer = document.getElementById('categoryFilters');
+
+            filterContainer.innerHTML = categories.map(cat => `
+                <button class="btn btn-outline-primary filter-btn ${cat === 'all' ? 'active' : ''}"
+                        onclick="filterByCategory('${cat}')">
+                    ${cat === 'all' ? 'All Posts' : cat}
+                </button>
+            `).join('');
+
+            document.getElementById('filterSection').style.display = 'block';
+        }
+
+        // Filter posts by category
+        function filterByCategory(category) {
+            currentFilter = category;
+
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderBlogCards();
+        }
+
+        // Get filtered posts
+        function getFilteredPosts() {
+            if (currentFilter === 'all') {
+                return allBlogPosts;
+            }
+            return allBlogPosts.filter(post => post.category === currentFilter);
+        }
+
+        function renderBlogCards() {
+            const grid = document.getElementById('blogGrid');
+            const posts = getFilteredPosts();
+
+            if (posts.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-12 text-center text-muted py-5">
+                        <h3>No posts in this category</h3>
+                        <p>Check back soon for new content!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = posts.map(post => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card blog-card">
+                        <img src="${post.image}" class="card-img-top" alt="${post.title}">
+                        <div class="card-body d-flex flex-column">
+                            <div class="mb-2">
+                                <span class="badge badge-date">${post.category}</span>
+                                <span class="badge bg-secondary ms-2">${new Date(post.date).toLocaleDateString()}</span>
+                            </div>
+                            <h5 class="card-title">${post.title}</h5>
+                            <p class="card-text flex-grow-1">${post.excerpt}</p>
+                            <button class="btn btn-primary btn-read-more mt-auto" onclick="showArticle(${post.id})">
+                                Read More →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showArticle(id) {
+            const post = allBlogPosts.find(p => p.id === id);
+            if (!post) return;
+
+            document.getElementById('blogGrid').classList.add('d-none');
+            document.getElementById('heroSection').classList.add('d-none');
+            document.getElementById('filterSection').style.display = 'none';
+            document.getElementById('fullArticle').classList.remove('d-none');
+            document.getElementById('articleContent').innerHTML = post.content;
+            window.scrollTo(0, 0);
+        }
+
+        function showHome() {
+            document.getElementById('blogGrid').classList.remove('d-none');
+            document.getElementById('heroSection').classList.remove('d-none');
+            document.getElementById('filterSection').style.display = 'block';
+            document.getElementById('fullArticle').classList.add('d-none');
+            window.scrollTo(0, 0);
+            return false;
+        }
+
+        // Initialize blog on page load
+        loadBlogPosts();
+    </script>
+</body>
+</html>
