@@ -172,7 +172,7 @@
         let currentFilter = 'all';
 
         // IMPORTANT: Replace 'YOUR-USERNAME' and 'YOUR-REPO' with your actual GitHub username and repository name
-        const GITHUB_POSTS_URL = 'https://raw.githubusercontent.com/dabulseco/ai-education-blog/main/blog-posts.json';
+        const GITHUB_POSTS_URL = './blog-posts.json';
 
         // Load blog posts from GitHub
         async function loadBlogPosts() {
@@ -218,27 +218,30 @@
         function setupFilters() {
             const categories = ['all', ...new Set(allBlogPosts.map(post => post.category))];
             const filterContainer = document.getElementById('categoryFilters');
-
+        
             filterContainer.innerHTML = categories.map(cat => `
                 <button class="btn btn-outline-primary filter-btn ${cat === 'all' ? 'active' : ''}"
-                        onclick="filterByCategory('${cat}')">
+                        onclick="filterByCategory('${cat}', event)"> 
                     ${cat === 'all' ? 'All Posts' : cat}
                 </button>
             `).join('');
-
+        
             document.getElementById('filterSection').style.display = 'block';
         }
 
         // Filter posts by category
-        function filterByCategory(category) {
+        function filterByCategory(category, event) {
             currentFilter = category;
-
-            // Update active button
+        
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
-
+            
+            // Check if event and target exist before accessing classList
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        
             renderBlogCards();
         }
 
